@@ -1,4 +1,22 @@
-import crypto from "crypto";
+import bcrypt from "bcrypt";
+
+const getUsers = async (req, reply) => {
+  try {
+    const Users = await req.server.registerUsers.findAll();
+    reply.send(Users);
+  } catch (error) {
+    reply.send(error);
+  }
+};
+
+const getRegisterUsersById = async (req, reply) => {
+  try {
+    const user = await req.server.User.findByPk(req.params.id);
+    reply.code(200).send(user);
+  } catch (error) {
+    throw error;
+  }
+};
 
 const loginUser = async (req, reply) => {
   try {
@@ -50,4 +68,4 @@ const logout = async (req, reply) => {
   }
 };
 
-export { loginUser, logout };
+export { loginUser, logout, getUsers, getRegisterUsersById };

@@ -20,10 +20,15 @@ const myPlugin = async (fastify, opts, done) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
   });
 
   try {
-    await User.sync({ force: false });
+    await User.sync({ force: true });
     console.log("User table created successfully");
   } catch (error) {
     console.error(error);
