@@ -9,39 +9,23 @@ export default fp(async (fastify, opts) => {
     scope: ["profile", "email"],
     credentials: {
       client: {
-        id: process.env.CLIENT_ID,
-        secret: process.env.CLIENT_SECRET,
+        id: process.env.GOOGLE_OAUTH_CLIENT_ID,
+        secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
       },
       auth: oauthPlugin.GOOGLE_CONFIGURATION,
     },
     startRedirectPath: "/login/google",
-    callbackUri: "http://localhost:3000/",
+    callbackUri: "http://localhost:3000/google/callback",
   });
 
-  fastify.get("/login/google/callback", async function (request, reply) {
+  fastify.get("/google/callback", async function (request, reply) {
     try {
-      const result =
+      const { token } =
         await fastify.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(
           request
         );
-
-      if (!result || !result.token || !result.token.access_token) {
-        reply.send(new Error("Invalid access token"));
-        return;
-      }
-
-      const { access_token } = result.token;
-
-      const { body } = await sget.promise.concat({
-        url: "https://www.googleapis.com/oauth2/v2/userinfo",
-        method: "GET",
-        headers: {
-          Authorization: "Bearer " + access_token,
-        },
-        json: true,
-      });
-
-      reply.send(body);
+      console.log(token.access_token);
+      reply.send({ access_token: token.access_token });
     } catch (error) {
       reply.send(error);
     }
